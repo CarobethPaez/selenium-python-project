@@ -1,40 +1,37 @@
-# conftest.py
-import pytest
 import os
+import pytest
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-def pytest_configure(config):
-    """Configuración global de pytest"""
-    config.addinivalue_line(
-        "markers", "smoke: Tests críticos"
-    )
-
 def pytest_runtest_makereport(item, call):
     """Hook para tomar screenshot cuando falla un test"""
     if call.when == 'call' and call.excinfo is not None:
-        # El test falló — tomar screenshot
         driver = item.funcargs.get('driver')
         if driver:
-            # Crear carpeta de screenshots si no existe
             os.makedirs('reports/screenshots', exist_ok=True)
-            
-            # Nombre del screenshot con timestamp
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             test_name = item.name.replace('/', '_')
             screenshot_path = f'reports/screenshots/{test_name}_{timestamp}.png'
-            
-            # Tomar screenshot
             driver.save_screenshot(screenshot_path)
             print(f'\n📸 Screenshot guardado: {screenshot_path}')
+
+def pytest_html_report_title(report):
+    """Personalizar el título del reporte"""
+    report.title = "Selenium Python — E2E Test Results"
 
 @pytest.fixture(scope='function')
 def driver():
     options = webdriver.ChromeOptions()
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    
+    # Headless en CI/CD
+    if os.environ.get('CI'):
+        options.add_argument('--headless')
+        options.add_argument('--window-size=1920,1080')
     
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
