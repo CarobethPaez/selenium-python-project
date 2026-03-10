@@ -1,66 +1,43 @@
-# tests/test_login.py
-import pytest
-from pages.login_page import LoginPage
+# pages/login_page.py
+from selenium.webdriver.common.by import By
+from pages.base_page import BasePage
 
-class TestLogin:
+BASE_URL = 'https://www.saucedemo.com'
 
-    def test_login_happy_path(self, driver):
-        """Test: login con credenciales válidas"""
-        # Arrange
-        login_page = LoginPage(driver)
-        login_page.visit()
-
-        # Act
-        login_page.login('standard_user', 'secret_sauce')
-
-        # Assert
-        assert '/inventory' in driver.current_url
-
-    def test_login_invalid_credentials(self, driver):
-        """Test: login con credenciales inválidas"""
-        # Arrange
-        login_page = LoginPage(driver)
-        login_page.visit()
-
-        # Act
-        login_page.login('invalid_user', 'wrong_password')
-
-        # Assert
-        assert login_page.is_error_displayed()
-
-    def test_login_empty_fields(self, driver):
-        """Test: login con campos vacíos"""
-        # Arrange
-        login_page = LoginPage(driver)
-        login_page.visit()
-
-        # Act
-        login_page.click_login()
-
-        # Assert
-        assert 'Username is required' in login_page.get_error_message()
-
-    def test_login_locked_user(self, driver):
-        """Test: login con usuario bloqueado"""
-        # Arrange
-        login_page = LoginPage(driver)
-        login_page.visit()
-
-        # Act
-        login_page.login('locked_out_user', 'secret_sauce')
-
-        # Assert
-        assert 'Sorry, this user has been locked out' in login_page.get_error_message()
-
-    def test_login_empty_password(self, driver):
-        """Test: login con password vacío"""
-        # Arrange
-        login_page = LoginPage(driver)
-        login_page.visit()
-
-        # Act
-        login_page.enter_username('standard_user')
-        login_page.click_login()
-
-        # Assert
-        assert 'Password is required' in login_page.get_error_message()
+class LoginPage(BasePage):
+    
+    # Selectores
+    USERNAME_INPUT = (By.ID, 'user-name')
+    PASSWORD_INPUT = (By.ID, 'password')
+    LOGIN_BUTTON = (By.ID, 'login-button')
+    ERROR_MESSAGE = (By.CSS_SELECTOR, '[data-test="error"]')
+    
+    def visit(self):
+        """Navegar a la página de login"""
+        self.driver.get(BASE_URL)
+    
+    def enter_username(self, username: str):
+        """Ingresar nombre de usuario"""
+        self.type_text(self.USERNAME_INPUT, username)
+    
+    def enter_password(self, password: str):
+        """Ingresar contraseña"""
+        self.type_text(self.PASSWORD_INPUT, password)
+    
+    def click_login(self):
+        """Click en el botón de login"""
+        self.click(self.LOGIN_BUTTON)
+    
+    def login(self, username: str, password: str):
+        """Método completo de login"""
+        self.enter_username(username)
+        self.enter_password(password)
+        self.click_login()
+    
+    def get_error_message(self) -> str:
+        """Obtener el mensaje de error"""
+        return self.get_text(self.ERROR_MESSAGE)
+    
+    def is_error_displayed(self) -> bool:
+        """Verificar si el error está visible"""
+        return self.is_displayed(self.ERROR_MESSAGE)
