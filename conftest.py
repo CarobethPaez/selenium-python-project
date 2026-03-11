@@ -28,6 +28,13 @@ def driver():
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--disable-gpu')
     
+    # Deshabilitar popups de contraseñas ← nuevo
+    options.add_experimental_option('prefs', {
+        'credentials_enable_service': False,
+        'profile.password_manager_enabled': False,
+        'profile.password_manager_leak_detection': False
+    })
+    
     # Headless en CI/CD
     if os.environ.get('CI'):
         options.add_argument('--headless')

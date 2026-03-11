@@ -3,17 +3,22 @@
 ![Python](https://img.shields.io/badge/Python-3.13-blue)
 ![Selenium](https://img.shields.io/badge/Selenium-4-brightgreen)
 ![pytest](https://img.shields.io/badge/pytest-8-orange)
+![Tests](https://img.shields.io/badge/tests-18%20passed-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 E2E Testing framework built with Selenium and Python using Page Object Model architecture.
 
 ## ✨ Features
 - ✅ Page Object Model architecture
+- ✅ BasePage with reusable methods
 - ✅ Python type hints for better code quality
 - ✅ Automatic ChromeDriver management
 - ✅ HTML reports with pytest-html
 - ✅ Setup and teardown with pytest fixtures
-- ✅ Cross-browser testing ready
+- ✅ Screenshots on test failure
+- ✅ Data-Driven Testing with pytest.mark.parametrize
+- ✅ Test markers: smoke, regression, login, cart, checkout
+- ✅ GitHub Actions CI/CD pipeline
 
 ## 🚀 Tech Stack
 - **Selenium 4** — E2E Testing framework
@@ -25,17 +30,27 @@ E2E Testing framework built with Selenium and Python using Page Object Model arc
 ## 📁 Project Structure
 ```
 selenium-python-project/
+├── .github/
+│   └── workflows/
+│       └── selenium.yml       # CI/CD pipeline
 ├── pages/
-│   ├── __init__.py
-│   └── login_page.py      # Page Objects
+│   ├── base_page.py           # Base Page Object
+│   ├── login_page.py          # Login Page Object
+│   ├── inventory_page.py      # Inventory Page Object
+│   ├── cart_page.py           # Cart Page Object
+│   └── checkout_page.py       # Checkout Page Object
 ├── tests/
-│   ├── __init__.py
-│   └── test_login.py      # Test files
-├── reports/               # Generated reports
-├── utils/                 # Utilities
-├── conftest.py            # pytest fixtures
-├── pytest.ini             # pytest config
-└── requirements.txt       # Dependencies
+│   ├── test_login.py          # Login tests
+│   ├── test_cart.py           # Cart tests
+│   ├── test_inventory.py      # Inventory tests
+│   ├── test_checkout.py       # Checkout tests
+│   └── test_login_parametrized.py  # Parametrized tests
+├── utils/
+│   └── test_data.py           # Test data
+├── reports/                   # Generated reports
+├── conftest.py                # pytest fixtures
+├── pytest.ini                 # pytest config
+└── requirements.txt           # Dependencies
 ```
 
 ## ▶️ How to Run
@@ -59,20 +74,37 @@ pip install -r requirements.txt
 # Run all tests
 pytest tests/ -v
 
-# Run specific test file
-pytest tests/test_login.py -v
+# Run by marker
+pytest tests/ -v -m smoke
+pytest tests/ -v -m regression
+pytest tests/ -v -m login
+pytest tests/ -v -m checkout
 ```
 
 ## 📊 Reports
 ```bash
 # Generate HTML report
 pytest tests/ -v --html=reports/report.html --self-contained-html
-```
-Reports are automatically generated in the `reports/` folder.
 
-## 🌐 Test Coverage
-- ✅ Login Happy Path
-- ✅ Login with invalid credentials
-- ✅ Login with empty fields
-- ✅ Login with locked user
-- ✅ Login with empty password
+# Open report
+# Windows:
+start reports/report.html
+```
+
+## 🧪 Test Coverage
+
+| Module | Tests | Markers |
+|--------|-------|---------|
+| Login | 5 | smoke, regression, login |
+| Cart | 3 | regression, cart |
+| Inventory | 3 | smoke, regression |
+| Checkout | 3 | smoke, regression, checkout |
+| Login Parametrized | 4 | regression, login |
+| **Total** | **18** | |
+
+## 🌐 CI/CD
+- ✅ GitHub Actions pipeline
+- ✅ Runs on every push to main
+- ✅ Headless Chrome in CI
+- ✅ HTML report uploaded as artifact
+- ✅ Screenshots uploaded on failure
